@@ -1,6 +1,7 @@
 {
     "name": "tic-tac-toe",
     "version": "0.1.0",
+    "homepage": "https://github.com/aaloksg/tic-tac-toe.git",
     "private": true,
     "scripts": {
         "dev": "next dev",

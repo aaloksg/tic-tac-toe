@@ -84,7 +84,7 @@ const GameBoard = ({
             return;
         }
         setGameInProgress(moveNo > 0);
-    }, [moveNo, winner, onGameEnd, setGameInProgress]);
+    }, [moveNo, winner, setGameInProgress]);
 
     const resetGame = () => {
         setWinner(undefined);

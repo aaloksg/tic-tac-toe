@@ -37,6 +37,14 @@ const selectD3Element = <T extends d3.BaseType, G extends d3.BaseType>(
     return selection;
 };
 
+type PieDatum = {
+    startAngle: number;
+    innerRadius?: number;
+    outerRadius?: number;
+    endAngle: number;
+    padAngle?: number | undefined;
+};
+
 const ModernPieChart = ({
     attribute,
     values,
@@ -83,14 +91,20 @@ const ModernPieChart = ({
         // SVG path string for a given angle, we pass an object with an endAngle
         // property to the arc function, and it will return the corresponding string.
         const arc = d3
-            .arc()
+            .arc<PieDatum>()
             .innerRadius(innerRadius)
             .outerRadius(outerRadius)
             .endAngle(tau);
 
         // Returns a tween for a transition’s "d" attribute, transitioning any selected
         // arcs from their current angle to the specified new angle.
-        const arcTween = (newAngle: number) => {
+        const arcTween = (
+            newAngle: number
+        ): d3.ValueFn<
+            SVGPathElement,
+            PieDatum,
+            (this: SVGPathElement, t: number) => string
+        > => {
             // The function passed to attrTween is invoked for each selected element when
             // the transition starts, and for each element returns the interpolator to use
             // over the course of transition. This function is thus responsible for
@@ -98,7 +112,7 @@ const ModernPieChart = ({
             // element’s bound datum, d.endAngle), and the ending angle (simply the
             // newAngle argument to the enclosing function).
             // https://d3js.org/d3-transition/modifying#transition_attrTween
-            return (d: d3.PieArcDatum<undefined>) => {
+            return (d: PieDatum) => {
                 // To interpolate between the two angles, we use the default d3.interpolate.
                 // (Internally, this maps to d3.interpolateNumber, since both of the
                 // arguments to d3.interpolate are numbers.) The returned function takes a
@@ -114,7 +128,7 @@ const ModernPieChart = ({
                 // to run arbitrary code for every tick, say if you want to set multiple
                 // attributes from a single function.) The argument t ranges from 0, at the
                 // start of the transition, to 1, at the end.
-                return (t: number) => {
+                return (t: number): string => {
                     // Calculate the current arc angle based on the transition time, t. Since
                     // the t for the transition and the t for the interpolate both range from
                     // 0 to 1, we can pass t directly to the interpolator.
@@ -131,7 +145,7 @@ const ModernPieChart = ({
                     // (that is, the end angle) rather than the path string itself.
                     // Interpolating the angles in polar coordinates, rather than the raw path
                     // string, produces valid intermediate arcs during the transition.
-                    return arc(d);
+                    return arc(d) ?? '';
                 };
             };
         };
@@ -142,7 +156,7 @@ const ModernPieChart = ({
             () => g.append('path').attr('id', BACKGROUND_ARC),
             g
         )
-            .datum({ startAngle: 0 })
+            .datum({ startAngle: 0, endAngle: tau })
             .style('fill', ENTITY_2_COLOR)
             .attr('d', arc);
 
@@ -152,7 +166,7 @@ const ModernPieChart = ({
             () => g.append('path').attr('id', FOREGROUND_ARC),
             g
         )
-            .datum({ startAngle: tau })
+            .datum({ startAngle: tau, endAngle: tau })
             .style('fill', ENTITY_1_COLOR)
             .attr('d', arc);
         if (values[0] === undefined || values[1] === undefined) return;

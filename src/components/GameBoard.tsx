@@ -1,7 +1,7 @@
 'use client';
 
 import { GameResult, Player, XOValues } from '@/definitions/interfaces';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import GameCell from './GameCell';
 import { cn } from 'clsx-for-tailwind';
 import CustomButton from './inputs/CustomButton';
@@ -34,6 +34,8 @@ type GameCell = {
     index: number;
 };
 
+let _computerTurnPending = false;
+
 const GameBoard = ({
     player1,
     player2,
@@ -48,11 +50,17 @@ const GameBoard = ({
     const [winner, setWinner] = useState<Player>();
     const [winningSequence, setWinningSequence] = useState<WinSequence>();
 
+    const [isComputerTurn, setComputerTurn] = useState(false);
+
     useEffect(() => {
         if (moveNo > 0) {
             return;
         }
         setIsPlayer1(player1.key === GAME_STARTS_WITH);
+        const nextPlayer = player1.key === GAME_STARTS_WITH ? player1 : player2;
+        _computerTurnPending = !!nextPlayer.isComputer;
+        setComputerTurn(_computerTurnPending);
+
         setCells(
             Array(9)
                 .fill(1)
@@ -61,7 +69,7 @@ const GameBoard = ({
                     index,
                 }))
         );
-    }, [player1.key, moveNo]);
+    }, [player1.key, player1.isComputer, player2.isComputer, moveNo]);
 
     useEffect(() => {
         if (winner) {
@@ -82,6 +90,7 @@ const GameBoard = ({
         setWinner(undefined);
         setIsDraw(false);
         setWinningSequence(undefined);
+        setComputerTurn(false);
         setMoveNo(0);
         onGameRestart();
     };
@@ -103,12 +112,30 @@ const GameBoard = ({
 
         setWinningSequence(winningSequence);
         setWinner(cells[winningSequence[0]].player);
-        return;
     };
 
     const setNextPlayer = (): void => {
+        const nextPlayer = isPlayer1 ? player2 : player1;
         setIsPlayer1(!isPlayer1);
+        _computerTurnPending = !!nextPlayer.isComputer;
+        setComputerTurn(_computerTurnPending);
     };
+
+    const makeComputerMove = useCallback(() => {
+        if (winner || isDraw || !isComputerTurn || !_computerTurnPending) {
+            return;
+        }
+        const freeCellIndices = cells.flatMap((cell) =>
+            cell.player ? [] : [cell.index]
+        );
+
+        if (!freeCellIndices.length) return;
+
+        const randomIndex = Math.floor(Math.random() * freeCellIndices.length);
+
+        handleOnClick(freeCellIndices[randomIndex]);
+        _computerTurnPending = false;
+    }, [isComputerTurn]);
 
     const handleOnClick = (index: number): void => {
         const currentCell = cells[index];
@@ -122,6 +149,12 @@ const GameBoard = ({
         setNextPlayer();
         calculateWinner();
     };
+
+    useMemo(() => {
+        if (!isComputerTurn) return;
+
+        setTimeout(makeComputerMove, 1500);
+    }, [isComputerTurn]);
 
     return (
         <div className="flex h-full w-full flex-col gap-3 overflow-hidden">
@@ -142,6 +175,7 @@ const GameBoard = ({
                                         cell.index
                                     ),
                                 })}
+                                disabled={isComputerTurn}
                                 onClick={() => handleOnClick(cell.index)}
                             />
                         ))}

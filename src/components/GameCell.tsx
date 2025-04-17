@@ -7,9 +7,15 @@ type GameCellProps = {
     player: Player | undefined;
     className?: string | string[];
     onClick: () => void;
+    disabled?: boolean;
 };
 
-const GameCell = ({ player, className, onClick }: GameCellProps) => {
+const GameCell = ({
+    player,
+    className,
+    onClick,
+    disabled = false,
+}: GameCellProps) => {
     return (
         <div
             className={cn(
@@ -27,7 +33,7 @@ const GameCell = ({ player, className, onClick }: GameCellProps) => {
             <button
                 className="h-full w-full transition-all duration-500 enabled:cursor-pointer"
                 onClick={() => onClick()}
-                disabled={player !== undefined}
+                disabled={player !== undefined || disabled}
             >
                 {player?.key || ''}
             </button>

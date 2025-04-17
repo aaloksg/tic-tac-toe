@@ -13,6 +13,9 @@ import {
 import useLocalData from '@/hooks/useLocalData';
 import CustomButton from './inputs/CustomButton';
 import GameStats from './GameStats';
+import CustomCheckbox from './inputs/CustomCheckbox';
+import { Field, Label } from '@headlessui/react';
+import { cn } from 'clsx-for-tailwind';
 
 type XOKey = OptionProps & {
     value: XOValues;
@@ -27,8 +30,43 @@ const XO_KEYS: XOKey[] = [
     },
 ];
 
+let lastHumanName = 'Player 2';
+
+const COMPUTER_PLAYER: Pick<Player, 'name' | 'isComputer'> = {
+    name: 'Compu-tic-tac-toe-r',
+    isComputer: true,
+};
+
 const GameUI = () => {
     const [gameInProgress, setGameInProgress] = useState(false);
+
+    const [vsComputer, setOpponentComputer] = useState(false);
+
+    const playVsComputer = (enable: boolean): void => {
+        setOpponentComputer(enable);
+        if (!enable) {
+            setPlayer2({
+                ...player2,
+                isComputer: false,
+                name:
+                    lastHumanName && lastHumanName !== COMPUTER_PLAYER.name
+                        ? lastHumanName
+                        : 'Player 2',
+            });
+            return;
+        }
+        lastHumanName = player2.name;
+        if (player1.name === COMPUTER_PLAYER.name) {
+            setPlayer1({
+                ...player1,
+                name: `${COMPUTER_PLAYER.name} (1)`,
+            });
+        }
+        setPlayer2({
+            ...player2,
+            ...COMPUTER_PLAYER,
+        });
+    };
 
     const localData = useLocalData<GameData>();
 
@@ -36,8 +74,13 @@ const GameUI = () => {
         name: localData.value?.lastPlayer1 ?? 'Player 1',
         key: XO_KEYS[0].value,
     });
+    const player2Name =
+        localData.value?.lastPlayer2 &&
+        localData.value?.lastPlayer2 !== COMPUTER_PLAYER.name
+            ? localData.value?.lastPlayer2
+            : 'Player 2';
     const [player2, setPlayer2] = useState<Player>({
-        name: localData.value?.lastPlayer2 ?? 'Player 2',
+        name: player2Name,
         key: XO_KEYS[1].value,
     });
 
@@ -195,17 +238,31 @@ const GameUI = () => {
                         selectOption={handleSetPlayer2Key}
                         disabled={gameInProgress}
                     />
+                    <Field className="flex items-center gap-2 self-center">
+                        <CustomCheckbox
+                            value={vsComputer}
+                            handleUpdate={playVsComputer}
+                            disabled={gameInProgress}
+                        />
+                        <Label
+                            className={cn('cursor-pointer text-base', {
+                                'cursor-default': gameInProgress,
+                            })}
+                        >
+                            Play against Computer
+                        </Label>
+                    </Field>
                 </div>
             </div>
             <div className="flex justify-between gap-3">
                 <div className="flex flex-col gap-1">
                     <span className="text-lg font-light italic"> Note: </span>
                     <span className="text-base font-light italic">
-                        X always goes first.{' '}
+                        X always goes first.
                     </span>
                 </div>
                 <CustomButton
-                    className="flex items-center justify-end gap-2"
+                    className="flex h-min items-center justify-end gap-2"
                     onClick={() => setShowStats(true)}
                 >
                     <span>Admire Stats</span>

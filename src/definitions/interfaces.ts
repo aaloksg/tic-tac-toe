@@ -3,6 +3,7 @@ export type XOValues = 'X' | 'O';
 export type Player = {
     name: string;
     key: XOValues;
+    isComputer?: boolean;
 };
 
 // -1: Game aborted

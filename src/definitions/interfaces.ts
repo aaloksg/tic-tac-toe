@@ -14,6 +14,7 @@ export type GameResult = -1 | 0 | XOValues;
 
 type PeerGame = Partial<Record<XOValues, string>> & {
     result: GameResult;
+    isBoltMode?: boolean;
 };
 
 type H2HData = {

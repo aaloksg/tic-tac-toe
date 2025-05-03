@@ -7,7 +7,6 @@ import { cn } from 'clsx-for-tailwind';
 import CustomButton from './inputs/CustomButton';
 
 const GAME_STARTS_WITH: XOValues = 'X';
-const MAX_MOVES = 9;
 
 type WinSequence = [number, number, number];
 const WINNING_SEQUENCES: WinSequence[] = [
@@ -27,6 +26,7 @@ type GameBoardProps = {
     setGameInProgress: (progress: boolean) => void;
     onGameEnd?: (gameResult: GameResult) => void;
     onGameRestart: () => void;
+    isBoltMode?: boolean;
 };
 
 type GameCell = {
@@ -42,6 +42,7 @@ const GameBoard = ({
     setGameInProgress,
     onGameEnd,
     onGameRestart,
+    isBoltMode,
 }: GameBoardProps) => {
     const [cells, setCells] = useState<GameCell[]>([]);
     const [isPlayer1, setIsPlayer1] = useState<boolean>();
@@ -51,6 +52,9 @@ const GameBoard = ({
     const [winningSequence, setWinningSequence] = useState<WinSequence>();
 
     const [isComputerTurn, setComputerTurn] = useState(false);
+
+    const [player1Turns, setPlayer1Turns] = useState<number[]>([]);
+    const [player2Turns, setPlayer2Turns] = useState<number[]>([]);
 
     useEffect(() => {
         if (moveNo > 0) {
@@ -77,7 +81,7 @@ const GameBoard = ({
             onGameEnd?.(winner.key);
             return;
         }
-        if (moveNo === MAX_MOVES) {
+        if (cells.every((cell) => cell.player !== undefined)) {
             setGameInProgress(false);
             setIsDraw(true);
             onGameEnd?.(0);
@@ -92,6 +96,8 @@ const GameBoard = ({
         setWinningSequence(undefined);
         setComputerTurn(false);
         setMoveNo(0);
+        setPlayer1Turns([]);
+        setPlayer2Turns([]);
         onGameRestart();
     };
 
@@ -144,6 +150,22 @@ const GameBoard = ({
         const updatedCells = cells.slice();
         updatedCells[index].player = isPlayer1 ? player1 : player2;
 
+        if (isPlayer1) {
+            if (isBoltMode && player1Turns.length > 2) {
+                updatedCells[player1Turns[0]].player = undefined;
+                setPlayer1Turns([...player1Turns.slice(1), index]);
+            } else {
+                setPlayer1Turns([...player1Turns, index]);
+            }
+        } else {
+            if (isBoltMode && player2Turns.length > 2) {
+                updatedCells[player2Turns[0]].player = undefined;
+                setPlayer2Turns([...player2Turns.slice(1), index]);
+            } else {
+                setPlayer2Turns([...player2Turns, index]);
+            }
+        }
+
         setCells(updatedCells);
         setMoveNo(moveNo + 1);
         setNextPlayer();
@@ -170,11 +192,27 @@ const GameBoard = ({
                             <GameCell
                                 key={`cell-${cell.index}`}
                                 player={cell.player}
-                                className={cn('max-h-1/3 max-w-1/3', {
-                                    'bg-amber-300': winningSequence?.includes(
-                                        cell.index
-                                    ),
-                                })}
+                                className={cn(
+                                    'max-h-1/3 max-w-1/3',
+                                    {
+                                        'bg-amber-300':
+                                            winningSequence?.includes(
+                                                cell.index
+                                            ),
+                                    },
+                                    {
+                                        'opacity-75':
+                                            isBoltMode &&
+                                            (isPlayer1
+                                                ? cell.player === player1 &&
+                                                  player1Turns.length > 2 &&
+                                                  player1Turns[0] === cell.index
+                                                : cell.player === player2 &&
+                                                  player2Turns.length > 2 &&
+                                                  player2Turns[0] ===
+                                                      cell.index),
+                                    }
+                                )}
                                 disabled={isComputerTurn}
                                 onClick={() => handleOnClick(cell.index)}
                             />

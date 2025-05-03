@@ -42,6 +42,8 @@ const GameUI = () => {
 
     const [vsComputer, setOpponentComputer] = useState(false);
 
+    const [isBoltMode, setBoltMode] = useState(false);
+
     const playVsComputer = (enable: boolean): void => {
         setOpponentComputer(enable);
         if (!enable) {
@@ -177,6 +179,7 @@ const GameUI = () => {
                 [player1.key]: player1.name,
                 [player2.key]: player2.name,
                 result,
+                isBoltMode,
             });
 
             localData.value = gameData;
@@ -238,7 +241,7 @@ const GameUI = () => {
                         selectOption={handleSetPlayer2Key}
                         disabled={gameInProgress}
                     />
-                    <Field className="flex items-center gap-2 self-center">
+                    <Field className="flex items-center gap-2">
                         <CustomCheckbox
                             value={vsComputer}
                             handleUpdate={playVsComputer}
@@ -250,6 +253,20 @@ const GameUI = () => {
                             })}
                         >
                             Play against Computer
+                        </Label>
+                    </Field>
+                    <Field className="flex items-center gap-2">
+                        <CustomCheckbox
+                            value={isBoltMode}
+                            handleUpdate={setBoltMode}
+                            disabled={gameInProgress}
+                        />
+                        <Label
+                            className={cn('cursor-pointer text-base', {
+                                'cursor-default': gameInProgress,
+                            })}
+                        >
+                            Play Tic-Tac-Toe Bolt
                         </Label>
                     </Field>
                 </div>
@@ -276,6 +293,7 @@ const GameUI = () => {
                     setGameInProgress={setGameInProgress}
                     onGameEnd={onGameEnd}
                     onGameRestart={onGameRestart}
+                    isBoltMode={isBoltMode}
                 />
             </div>
             <GameStats

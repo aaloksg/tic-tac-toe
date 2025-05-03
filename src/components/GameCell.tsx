@@ -19,7 +19,7 @@ const GameCell = ({
     return (
         <div
             className={cn(
-                'flex aspect-square h-auto w-full items-center justify-center p-4',
+                'flex aspect-square h-auto w-full items-center justify-center',
                 'border-2 border-solid border-emerald-950 transition-all duration-1000',
                 'text-3xl font-bold capitalize',
                 player?.key === 'X'
@@ -31,7 +31,7 @@ const GameCell = ({
             )}
         >
             <button
-                className="h-full w-full transition-all duration-500 enabled:cursor-pointer"
+                className="h-full w-full p-4 transition-all duration-500 enabled:cursor-pointer"
                 onClick={() => onClick()}
                 disabled={player !== undefined || disabled}
             >

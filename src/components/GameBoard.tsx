@@ -81,7 +81,7 @@ const GameBoard = ({
             onGameEnd?.(winner.key);
             return;
         }
-        if (cells.every((cell) => cell.player !== undefined)) {
+        if (cells.length && cells.every((cell) => cell.player !== undefined)) {
             setGameInProgress(false);
             setIsDraw(true);
             onGameEnd?.(0);
@@ -192,26 +192,19 @@ const GameBoard = ({
                             <GameCell
                                 key={`cell-${cell.index}`}
                                 player={cell.player}
-                                className={cn(
-                                    'max-h-1/3 max-w-1/3',
-                                    {
-                                        'bg-amber-300':
-                                            winningSequence?.includes(
-                                                cell.index
-                                            ),
-                                    },
-                                    {
-                                        'opacity-75':
-                                            isBoltMode &&
-                                            (isPlayer1
-                                                ? cell.player === player1 &&
-                                                  player1Turns.length > 2 &&
-                                                  player1Turns[0] === cell.index
-                                                : cell.player === player2 &&
-                                                  player2Turns.length > 2 &&
-                                                  player2Turns[0] ===
-                                                      cell.index),
-                                    }
+                                className="max-h-1/3 max-w-1/3"
+                                fade={
+                                    isBoltMode &&
+                                    (isPlayer1
+                                        ? cell.player === player1 &&
+                                          player1Turns.length > 2 &&
+                                          player1Turns[0] === cell.index
+                                        : cell.player === player2 &&
+                                          player2Turns.length > 2 &&
+                                          player2Turns[0] === cell.index)
+                                }
+                                winningCell={winningSequence?.includes(
+                                    cell.index
                                 )}
                                 disabled={isComputerTurn}
                                 onClick={() => handleOnClick(cell.index)}

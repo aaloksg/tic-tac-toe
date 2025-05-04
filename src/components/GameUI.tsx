@@ -204,7 +204,7 @@ const GameUI = () => {
     );
 
     return (
-        <div className="flex h-full w-full flex-col gap-4 overflow-hidden bg-green-200 p-4">
+        <div className="flex h-full w-full flex-col gap-4 overflow-hidden bg-green-200 p-4 text-black">
             <div className="flex w-full justify-around gap-2">
                 <div className="flex flex-col gap-2 overflow-x-hidden">
                     <input
@@ -241,35 +241,40 @@ const GameUI = () => {
                         selectOption={handleSetPlayer2Key}
                         disabled={gameInProgress}
                     />
-                    <Field className="flex items-center gap-2">
-                        <CustomCheckbox
-                            value={vsComputer}
-                            handleUpdate={playVsComputer}
-                            disabled={gameInProgress}
-                        />
-                        <Label
-                            className={cn('cursor-pointer text-base', {
-                                'cursor-default': gameInProgress,
-                            })}
-                        >
-                            Play against Computer
-                        </Label>
-                    </Field>
-                    <Field className="flex items-center gap-2">
-                        <CustomCheckbox
-                            value={isBoltMode}
-                            handleUpdate={setBoltMode}
-                            disabled={gameInProgress}
-                        />
-                        <Label
-                            className={cn('cursor-pointer text-base', {
-                                'cursor-default': gameInProgress,
-                            })}
-                        >
-                            Play Tic-Tac-Toe Bolt
-                        </Label>
-                    </Field>
                 </div>
+            </div>
+            <div className="relative flex flex-col gap-3 self-center rounded-lg border border-black p-4">
+                <span className="absolute top-0 left-2 -translate-y-1/2 bg-green-200 px-1">
+                    Settings:
+                </span>
+                <Field className="flex items-center gap-2">
+                    <CustomCheckbox
+                        value={vsComputer}
+                        handleUpdate={playVsComputer}
+                        disabled={gameInProgress}
+                    />
+                    <Label
+                        className={cn('cursor-pointer text-base', {
+                            'cursor-default': gameInProgress,
+                        })}
+                    >
+                        Play against Computer
+                    </Label>
+                </Field>
+                <Field className="flex items-center gap-2">
+                    <CustomCheckbox
+                        value={isBoltMode}
+                        handleUpdate={setBoltMode}
+                        disabled={gameInProgress}
+                    />
+                    <Label
+                        className={cn('cursor-pointer text-base', {
+                            'cursor-default': gameInProgress,
+                        })}
+                    >
+                        Play Tic-Tac-Toe Bolt
+                    </Label>
+                </Field>
             </div>
             <div className="flex justify-between gap-3">
                 <div className="flex flex-col gap-1">

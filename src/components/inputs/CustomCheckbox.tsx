@@ -29,9 +29,9 @@ const CustomCheckbox = ({
             checked={enabled}
             onChange={onChange}
             className={cn(
-                'group flex h-6 w-6 cursor-pointer rounded-md bg-black p-0',
+                'group flex h-6 w-6 cursor-pointer rounded-md p-0',
                 'ring-0 ring-transparent outline-0 outline-transparent',
-                { 'cursor-default opacity-50': disabled },
+                { 'cursor-default opacity-50': disabled, 'bg-black': enabled },
                 className
             )}
             disabled={disabled}
@@ -44,9 +44,7 @@ const CustomCheckbox = ({
                 />
             )) || (
                 <MdCheckBoxOutlineBlank
-                    className={cn(
-                        'h-full w-full rounded-md fill-black p-0 ring-0'
-                    )}
+                    className={cn('h-full w-full rounded-md p-0 ring-0')}
                 />
             )}
         </Checkbox>

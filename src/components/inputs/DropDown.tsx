@@ -65,7 +65,7 @@ const DropDownInput = <T extends OptionProps>({
                         className={cn(
                             'flex items-center justify-between gap-2 rounded-lg bg-gray-800 px-3 py-1.5',
                             'text-sm/6 font-semibold text-white shadow-inner shadow-white/10',
-                            'focus:outline-none data-[focus]:outline-1 data-[focus]:outline-white enabled:data-[hover]:bg-gray-700 data-[open]:bg-gray-700',
+                            'focus:outline-none data-[focus]:outline-1 data-[focus]:outline-white enabled:data-[hover]:opacity-75 data-[open]:opacity-90',
                             'disabled:cursor-not-allowed disabled:opacity-50',
                             classValue
                         )}

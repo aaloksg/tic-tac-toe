@@ -8,6 +8,12 @@ import CustomButton from './inputs/CustomButton';
 
 const GAME_STARTS_WITH: XOValues = 'X';
 
+export const COMPUTER_PLAYERS = {
+    random: 'Mick',
+    attack: 'Mack',
+    smart: 'Moe',
+};
+
 type WinSequence = [number, number, number];
 const WINNING_SEQUENCES: WinSequence[] = [
     [0, 1, 2],
@@ -127,19 +133,93 @@ const GameBoard = ({
         setComputerTurn(_computerTurnPending);
     };
 
-    const makeComputerMove = useCallback(() => {
-        if (winner || isDraw || !isComputerTurn || !_computerTurnPending) {
-            return;
-        }
+    const getComputerMoves = (): [number, number, number] => {
+        let winningIndex = -1;
+        let defensiveIndex = -1;
+        let attackingIndex = -1;
+        WINNING_SEQUENCES.find((seq) => {
+            const includes: number[] = [];
+            const freeCells: number[] = [];
+            const player1Includes: number[] = [];
+            seq.forEach((index) => {
+                if (player2Turns.includes(index)) {
+                    includes.push(index);
+                } else if (player1Turns.includes(index)) {
+                    player1Includes.push(index);
+                } else {
+                    freeCells.push(index);
+                }
+            });
+            if (includes.length === 2 && freeCells.length === 1) {
+                winningIndex = freeCells[0];
+                return true;
+            }
+            if (
+                defensiveIndex === -1 &&
+                player1Includes.length === 2 &&
+                freeCells.length === 1
+            ) {
+                defensiveIndex = freeCells[0];
+            } else if (
+                attackingIndex === -1 &&
+                includes.length === 1 &&
+                freeCells.length === 2
+            ) {
+                attackingIndex = freeCells[0];
+            }
+            return false;
+        });
+        return [winningIndex, defensiveIndex, attackingIndex];
+    };
+
+    const makeRandomMove = (): number | undefined => {
         const freeCellIndices = cells.flatMap((cell) =>
             cell.player ? [] : [cell.index]
         );
 
-        if (!freeCellIndices.length) return;
+        if (!freeCellIndices.length) return undefined;
 
-        const randomIndex = Math.floor(Math.random() * freeCellIndices.length);
+        return freeCellIndices[
+            Math.floor(Math.random() * freeCellIndices.length)
+        ];
+    };
 
-        handleOnClick(freeCellIndices[randomIndex]);
+    const makeAttackingMove = (): number | undefined => {
+        const [winningIndex, , attackingIndex] = getComputerMoves();
+        if (winningIndex !== -1) return winningIndex;
+
+        if (attackingIndex !== -1) return attackingIndex;
+
+        return makeRandomMove();
+    };
+
+    const makeSmartMove = (): number | undefined => {
+        const [winningIndex, defensiveIndex, attackingIndex] =
+            getComputerMoves();
+        if (winningIndex !== -1) return winningIndex;
+
+        if (defensiveIndex !== -1) return defensiveIndex;
+
+        if (attackingIndex !== -1) return attackingIndex;
+
+        return makeRandomMove();
+    };
+
+    const makeComputerMove = useCallback(() => {
+        if (winner || isDraw || !isComputerTurn || !_computerTurnPending) {
+            return;
+        }
+
+        const nextMove =
+            player2.name === COMPUTER_PLAYERS.random
+                ? makeRandomMove()
+                : player2.name === COMPUTER_PLAYERS.attack
+                  ? makeAttackingMove()
+                  : makeSmartMove();
+
+        if (nextMove === undefined) return;
+
+        handleOnClick(nextMove);
         _computerTurnPending = false;
     }, [isComputerTurn]);
 

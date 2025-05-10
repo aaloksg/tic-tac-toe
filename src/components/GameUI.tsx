@@ -3,7 +3,7 @@
 import DropDownInput, { OptionProps } from '@/components/inputs/DropDown';
 import { useCallback, useState } from 'react';
 import { GrScorecard } from 'react-icons/gr';
-import GameBoard from './GameBoard';
+import GameBoard, { COMPUTER_PLAYERS } from './GameBoard';
 import {
     GameData,
     GameResult,
@@ -42,6 +42,15 @@ const GameUI = () => {
 
     const [vsComputer, setOpponentComputer] = useState(false);
 
+    const computerNames = Object.values(COMPUTER_PLAYERS).map((name) => ({
+        value: name,
+    }));
+
+    const handleComputerNameChange = ({ value }: OptionProps): void => {
+        COMPUTER_PLAYER.name = value;
+        handlePlayer2NameChange(value);
+    };
+
     const [isBoltMode, setBoltMode] = useState(false);
 
     const playVsComputer = (enable: boolean): void => {
@@ -58,6 +67,7 @@ const GameUI = () => {
             return;
         }
         lastHumanName = player2.name;
+        COMPUTER_PLAYER.name = COMPUTER_PLAYERS.random;
         if (player1.name === COMPUTER_PLAYER.name) {
             setPlayer1({
                 ...player1,
@@ -225,16 +235,27 @@ const GameUI = () => {
                     />
                 </div>
                 <div className="flex flex-col gap-2 overflow-x-hidden">
-                    <input
-                        className="rounded-xl bg-amber-300 p-2 text-black"
-                        type="text"
-                        placeholder="Enter player 2 name"
-                        value={player2.name}
-                        onChange={(event) =>
-                            handlePlayer2NameChange(event.target.value)
-                        }
-                        disabled={gameInProgress}
-                    ></input>
+                    {vsComputer ? (
+                        <DropDownInput
+                            items={computerNames}
+                            selectedId={COMPUTER_PLAYER.name}
+                            selectOption={handleComputerNameChange}
+                            disabled={gameInProgress}
+                            class="h-10 rounded-xl bg-amber-300 whitespace-nowrap text-black sm:min-w-40 md:min-w-50"
+                        />
+                    ) : (
+                        <input
+                            className="rounded-xl bg-amber-300 p-2 text-black"
+                            type="text"
+                            placeholder="Enter player 2 name"
+                            value={player2.name}
+                            onChange={(event) =>
+                                handlePlayer2NameChange(event.target.value)
+                            }
+                            disabled={gameInProgress}
+                        ></input>
+                    )}
+
                     <DropDownInput
                         items={XO_KEYS}
                         selectedId={player2.key}
@@ -258,7 +279,11 @@ const GameUI = () => {
                             'cursor-default': gameInProgress,
                         })}
                     >
-                        Play against Computer
+                        Play against Comput
+                        <sup>
+                            <strong>ictacto</strong>
+                        </sup>
+                        er
                     </Label>
                 </Field>
                 <Field className="flex items-center gap-2">

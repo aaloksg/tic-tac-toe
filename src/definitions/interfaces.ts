@@ -26,4 +26,6 @@ export type GameData = {
     lastPlayer1: string;
     lastPlayer2: string;
     h2h: H2HData[];
+    computerPlayer?: string;
+    isBoltMode?: boolean;
 };

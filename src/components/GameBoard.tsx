@@ -259,15 +259,15 @@ const GameBoard = ({
     }, [isComputerTurn]);
 
     return (
-        <div className="flex h-full w-full flex-col gap-3 overflow-hidden">
+        <div className="flex h-full w-full flex-col justify-center gap-3 overflow-hidden">
             {!winner && !isDraw && (
                 <div className="flex w-full items-center justify-center">
                     <span className="text-xl font-bold text-amber-950">{`${isPlayer1 ? player1.name : player2.name} to play...`}</span>
                 </div>
             )}
-            <div className="relative w-full grow overflow-hidden">
-                <div className="flex h-full w-full flex-col items-center">
-                    <div className="flex aspect-square h-min max-h-full max-w-full flex-wrap gap-0 rounded-xl border-4 border-solid border-black sm:grow">
+            <div className="relative w-full overflow-hidden md:grow">
+                <div className="flex h-full w-full flex-col items-center justify-center">
+                    <div className="flex aspect-square max-h-full max-w-full flex-wrap gap-0 rounded-xl border-4 border-solid border-black sm:grow">
                         {cells.map((cell) => (
                             <GameCell
                                 key={`cell-${cell.index}`}
@@ -312,6 +312,11 @@ const GameBoard = ({
                     </div>
                 )}
             </div>
+            {!winner && !isDraw && (
+                <div className="flex w-full items-center justify-center lg:hidden">
+                    <span className="-rotate-180 text-xl font-bold text-amber-950">{`${isPlayer1 ? player1.name : player2.name} to play...`}</span>
+                </div>
+            )}
         </div>
     );
 };
